@@ -120,9 +120,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static int a = 200;
+    static bool isButton1Clicked = false;
     static bool isButton2Clicked = false;
     static bool isButton3Clicked = false;
     static bool isButton4Clicked = false;
+    static bool isButton5Clicked = false;
+    static bool isButton6Clicked = false;
+    static bool isButton7Clicked = false;
+    static bool isButton8Clicked = false;
+    static bool isButton9Clicked = false;
+    static bool isButton10Clicked = false;
+    static bool isButton11Clicked = false;
+    static bool isButton12Clicked = false;
+    static bool goTo1 = false;
+    static bool goTo2 = false;
+    static bool goTo3 = false;
+    static bool goTo4 = false;
 
     HWND hButton1 = reinterpret_cast<HWND>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
@@ -131,17 +144,32 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
         if (HIWORD(wParam) == BN_CLICKED)  // Check if button was clicked
         {
-            if (LOWORD(wParam) == 1 || LOWORD(wParam) == 2 || LOWORD(wParam) == 3)  
+            switch (LOWORD(wParam))
             {
-                isButton2Clicked = true;
-            }
-            else if (LOWORD(wParam) == 4 || LOWORD(wParam) == 5 || LOWORD(wParam) == 6)  
-            {
-                isButton3Clicked = true;
-            }
-            else if (LOWORD(wParam) == 7 || LOWORD(wParam) == 8 || LOWORD(wParam) == 9)  
-            {
-                isButton4Clicked = true;
+            case 1: isButton1Clicked = true;
+                break;
+            case 2: isButton2Clicked = true;
+                break;
+            case 3: isButton3Clicked = true;
+                break;
+            case 4: isButton4Clicked = true;
+                break;
+            case 5: isButton5Clicked = true;
+                break;
+            case 6: isButton6Clicked = true;
+                break;
+            case 7: isButton7Clicked = true;
+                break;
+            case 8: isButton8Clicked = true;
+                break;
+            case 9: isButton9Clicked = true;
+                break;
+            case 10: isButton10Clicked = true;
+                break;
+            case 11: isButton11Clicked = true;
+                break;
+            case 12: isButton12Clicked = true;
+                break;
             }
         }
     case WM_PAINT:
@@ -164,23 +192,169 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     case WM_TIMER:
-        if (isButton2Clicked && a < 650)
+        if (isButton1Clicked || isButton2Clicked || isButton3Clicked)
         {
-            a += 1;
-            InvalidateRect(hwnd, NULL, TRUE);
-            UpdateWindow(hwnd);
+            if (a < 650)
+            {
+                a += 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else
+            {
+                if (isButton1Clicked)
+                {
+                    isButton1Clicked = false;
+                    goTo2 = true;
+                }
+                else if (isButton2Clicked)
+                {
+                    isButton2Clicked = false;
+                    goTo3 = true;
+                }
+                else if (isButton3Clicked)
+                {
+                    isButton3Clicked = false;
+                    goTo4 = true;
+                } 
+            }
         }
-        if (isButton3Clicked && a < 500)
+        else if (isButton4Clicked || isButton5Clicked || isButton6Clicked)
         {
-            a += 1;
-            InvalidateRect(hwnd, NULL, TRUE);
-            UpdateWindow(hwnd);
+            if (a < 500)
+            {
+                a += 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else if (a > 500) {
+                a -= 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            } 
+            else {
+                if (isButton4Clicked)
+                {
+                    isButton4Clicked = false;
+                    goTo1 = true;
+                }
+                else if (isButton5Clicked)
+                {
+                    isButton5Clicked = false;
+                    goTo3 = true;
+                }
+                else if (isButton6Clicked)
+                {
+                    isButton6Clicked = false;
+                    goTo4 = true;
+                }
+            }
         }
-        if (isButton4Clicked && a < 350)
+        else if (isButton7Clicked || isButton8Clicked || isButton9Clicked)
         {
-            a += 1;
-            InvalidateRect(hwnd, NULL, TRUE);
-            UpdateWindow(hwnd);
+            if (a < 350) {
+                a += 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else if (a > 350) {
+                a -= 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else {
+                if (isButton7Clicked)
+                {
+                    isButton7Clicked = false;
+                    goTo1 = true;
+                }
+                else if (isButton8Clicked)
+                {
+                    isButton8Clicked = false;
+                    goTo2 = true;
+                }
+                else if (isButton9Clicked)
+                {
+                    isButton9Clicked = false;
+                    goTo4 = true;
+                }
+            }
+        }
+        else if (isButton10Clicked || isButton11Clicked || isButton12Clicked)
+        {
+            if (a > 200)
+            {
+                a -= 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else {
+                if (isButton10Clicked)
+                {
+                    isButton10Clicked = false;
+                    goTo1 = true;
+                }
+                else if (isButton11Clicked)
+                {
+                    isButton11Clicked = false;
+                    goTo2 = true;
+                }
+                else if (isButton12Clicked)
+                {
+                    isButton12Clicked = false;
+                    goTo3 = true;
+                }
+            }
+        }
+        else if (goTo1)
+        {
+            if (a < 650)
+            {
+                a += 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else goTo1 = false;
+        }
+        else if (goTo2)
+        {
+            if (a > 500)
+            {
+                a -= 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else if (a < 500)
+            {
+                a += 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else goTo2 = false;
+        }
+        else if (goTo3)
+        {
+            if (a > 350)
+            {
+                a -= 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+            else if (a < 350)
+            {
+                a += 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+        }
+        else if (goTo4)
+        {
+            if (a > 200)
+            {
+                a -= 1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
         }
         break;
     case WM_DESTROY:
