@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <gdiplus.h>
+#include <iostream>
 
 using namespace Gdiplus;
 
@@ -39,8 +40,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        1400,
-        800,
+        1100,
+        700,
         NULL,
         NULL,
         hInstance,
@@ -85,10 +86,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         Graphics graphics(hdc);
         Pen pen(Color(255, 0, 0, 0));  // Create a black pen
+        Pen pen1(Color(255, 255, 255, 255));
 
-        // Draw a line from (50, 50) to (200, 200)
-        graphics.DrawRectangle(&pen, 50, 50, 200, 200);
+        int a = 200;
+       
+        graphics.DrawRectangle(&pen, 640, 40, 260, 700); // zewn
+        graphics.DrawLine(&pen, 900, 500, 1490, 500);
+        graphics.DrawLine(&pen, 50, 350, 640, 350);
+        graphics.DrawLine(&pen, 50, 650, 640, 650);
+        graphics.DrawLine(&pen, 900, 200, 1490, 200);
 
+        while (a != 650)
+        {
+            graphics.DrawRectangle(&pen1, 650, a-150, 240, 150);
+            a++;
+            graphics.DrawRectangle(&pen, 650, a-150, 240, 150); // œrodek
+            
+        }
 
         EndPaint(hwnd, &ps);
         return 0;
