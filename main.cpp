@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <gdiplus.h>
 #include <iostream>
+#include <string>
 
 using namespace Gdiplus;
 
@@ -9,6 +10,7 @@ const char* g_WindowClassName = "BlankWindowClass";
 
 // Step 2: Declare a global variable for the window handle
 HWND g_hwnd = NULL;
+HWND g_hButton = NULL;
 
 // Step 3: Declare the window procedure
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -31,6 +33,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszClassName = g_WindowClassName;
     RegisterClassEx(&wc);
+    int a = 200;
+
 
     // Step 7: Create the window
     g_hwnd = CreateWindowEx(
@@ -48,7 +52,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         NULL
     );
 
+
     if (g_hwnd == NULL)
+    {
+        return 0;
+    }
+
+    g_hButton = CreateWindow(
+        "BUTTON",
+        "1",
+        WS_CHILD | WS_VISIBLE,
+        55,
+        610,
+        25,
+        25,
+        g_hwnd,
+        NULL,
+        hInstance,
+        NULL
+    );
+
+    if (g_hButton == NULL)
     {
         return 0;
     }
@@ -57,6 +81,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(g_hwnd, nCmdShow);
     UpdateWindow(g_hwnd);
 
+    SetTimer(g_hwnd, 1, 10, NULL);  // Timer ID = 1, interval = 10 milliseconds
+
     // Step 9: Enter the message loop
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
@@ -64,6 +90,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    KillTimer(g_hwnd, 1);
 
     // Step 10: Shutdown GDI+
     GdiplusShutdown(gdiplusToken);
@@ -77,8 +105,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 // Step 12: Define the window procedure
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    static int a = 200;
+
+    static bool isButton1Clicked = false;  // Flag variable to track Button 1 click event
+
     switch (uMsg)
     {
+    case WM_COMMAND:
+        if (lParam == (LPARAM)g_hButton)  // Check if the button was clicked
+        {
+            isButton1Clicked = true;  // Set the flag to true
+            MessageBox(hwnd, "Button 2 was clicked!", "Button Clicked", MB_OK | MB_ICONINFORMATION);
+        }
+        break;
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -88,25 +127,30 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         Pen pen(Color(255, 0, 0, 0));  // Create a black pen
         Pen pen1(Color(255, 255, 255, 255));
 
-        int a = 200;
        
         graphics.DrawRectangle(&pen, 640, 40, 260, 700); // zewn
-        graphics.DrawLine(&pen, 900, 500, 1490, 500);
-        graphics.DrawLine(&pen, 50, 350, 640, 350);
-        graphics.DrawLine(&pen, 50, 650, 640, 650);
+        graphics.DrawRectangle(&pen, 650, a - 150, 240, 150); // œrodek
         graphics.DrawLine(&pen, 900, 200, 1490, 200);
+        graphics.DrawLine(&pen, 50, 350, 640, 350);
+        graphics.DrawLine(&pen, 900, 500, 1490, 500); 
+        graphics.DrawLine(&pen, 50, 650, 640, 650);
 
-        while (a != 650)
-        {
-            graphics.DrawRectangle(&pen1, 650, a-150, 240, 150);
-            a++;
-            graphics.DrawRectangle(&pen, 650, a-150, 240, 150); // œrodek
-            
-        }
 
         EndPaint(hwnd, &ps);
+       
         return 0;
     }
+    case WM_TIMER:
+        if (isButton1Clicked)  // Move the elevator only when Button 1 is clicked
+        {
+            // Update the elevator coordinates
+            a += 1;
+
+            // Redraw the window
+            InvalidateRect(hwnd, NULL, TRUE);
+            UpdateWindow(hwnd);
+        }
+        return 0;
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
