@@ -1,9 +1,18 @@
 ﻿#include <windows.h>
 #include <gdiplus.h>
 #include <string>
+#include <vector>
 
 using namespace Gdiplus;
-#pragma comment(lib, "gdiplus.lib")  // Link against the GDI+ library
+#pragma comment(lib, "gdiplus.lib") 
+
+struct ButtonData
+{
+    int x; 
+    int y; 
+    std::string text;
+    int id;
+};
 
 const char* GetWindowClassName()
 {
@@ -44,50 +53,50 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         NULL
     );
 
+
+
     if (hwnd == NULL)
     {
         return 0;
     }
 
-    HWND hButton1 = CreateWindow(
-        "BUTTON",
-        "1",
-        WS_CHILD | WS_VISIBLE,
-        50,
-        50,
-        50,
-        30,
-        hwnd,
-        NULL,
-        hInstance,
-        NULL
-    );
 
-    if (hButton1 == NULL)
+    std::vector<ButtonData> buttons;
+    buttons.push_back({ 50, 615, "2", 1 });
+    buttons.push_back({ 50, 580, "3", 2 });
+    buttons.push_back({ 50, 545, "4", 3 });
+    buttons.push_back({ 1450, 465, "1", 4 });
+    buttons.push_back({ 1450, 430, "3", 5 });
+    buttons.push_back({ 1450, 395, "4", 6 });
+    buttons.push_back({ 50, 315, "1", 7 });
+    buttons.push_back({ 50, 280, "2", 8 });
+    buttons.push_back({ 50, 245, "4", 9 });
+    buttons.push_back({ 1450, 165, "1", 10 });
+    buttons.push_back({ 1450, 130, "2", 11 });
+    buttons.push_back({ 1450, 95, "3", 12 });
+
+    for (const auto& button : buttons)
     {
-        return 0;
+        HWND hButton = CreateWindow(
+            "BUTTON",
+            button.text.c_str(),
+            WS_CHILD | WS_VISIBLE,
+            button.x,
+            button.y,
+            25,
+            25,
+            hwnd,
+            reinterpret_cast<HMENU>(button.id),  
+            hInstance,
+            NULL
+        );
+
+        if (hButton == NULL)
+        {
+            return 0;
+        }
     }
 
-    HWND hButton2 = CreateWindow(
-        "BUTTON",
-        "2",
-        WS_CHILD | WS_VISIBLE,
-        120,
-        50,
-        50,
-        30,
-        hwnd,
-        NULL,
-        hInstance,
-        NULL
-    );
-
-    if (hButton2 == NULL)
-    {
-        return 0;
-    }
-
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(hButton1));
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
@@ -111,23 +120,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static int a = 200;
-    static bool isButton1Clicked = false;
+    static bool isButton2Clicked = false;
+    static bool isButton3Clicked = false;
+    static bool isButton4Clicked = false;
 
     HWND hButton1 = reinterpret_cast<HWND>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
     switch (uMsg)
     {
     case WM_COMMAND:
-        if (lParam == (LPARAM)hButton1)
+        if (HIWORD(wParam) == BN_CLICKED)  // Check if button was clicked
         {
-
-            isButton1Clicked = true;  // Set the flag indicating Button 1 was clicked
+            if (LOWORD(wParam) == 1 || LOWORD(wParam) == 2 || LOWORD(wParam) == 3)  
+            {
+                isButton2Clicked = true;
+            }
+            else if (LOWORD(wParam) == 4 || LOWORD(wParam) == 5 || LOWORD(wParam) == 6)  
+            {
+                isButton3Clicked = true;
+            }
+            else if (LOWORD(wParam) == 7 || LOWORD(wParam) == 8 || LOWORD(wParam) == 9)  
+            {
+                isButton4Clicked = true;
+            }
         }
-        else if (lParam == (LPARAM)GetDlgItem(hwnd, 2))  // Check if Button 2 was clicked
-        {
-            MessageBox(hwnd, "Button 2 was clicked!", "Button Clicked", MB_OK | MB_ICONINFORMATION);
-        }
-        break;
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -138,7 +154,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 
         graphics.DrawRectangle(&pen, 640, 40, 260, 700); // zewn
-        graphics.DrawRectangle(&pen, 650, a - 150, 240, 150); // œrodek
+        graphics.DrawRectangle(&pen, 650, a - 150, 240, 150); // środek
         graphics.DrawLine(&pen, 900, 200, 1490, 200);
         graphics.DrawLine(&pen, 50, 350, 640, 350);
         graphics.DrawLine(&pen, 900, 500, 1490, 500);
@@ -148,7 +164,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     case WM_TIMER:
-        if (isButton1Clicked && a < 650)  // Move the line only if Button 1 was clicked
+        if (isButton2Clicked && a < 650)
+        {
+            a += 1;
+            InvalidateRect(hwnd, NULL, TRUE);
+            UpdateWindow(hwnd);
+        }
+        if (isButton3Clicked && a < 500)
+        {
+            a += 1;
+            InvalidateRect(hwnd, NULL, TRUE);
+            UpdateWindow(hwnd);
+        }
+        if (isButton4Clicked && a < 350)
         {
             a += 1;
             InvalidateRect(hwnd, NULL, TRUE);
