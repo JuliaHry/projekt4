@@ -1,29 +1,24 @@
-#include <windows.h>
+﻿#include <windows.h>
 #include <gdiplus.h>
-#include <iostream>
 #include <string>
 
 using namespace Gdiplus;
+#pragma comment(lib, "gdiplus.lib")  // Link against the GDI+ library
 
-// Step 1: Declare a global variable for the window class name
-const char* g_WindowClassName = "BlankWindowClass";
+const char* GetWindowClassName()
+{
+    static const char* windowClassName = "BlankWindowClass";
+    return windowClassName;
+}
 
-// Step 2: Declare a global variable for the window handle
-HWND g_hwnd = NULL;
-HWND g_hButton = NULL;
-
-// Step 3: Declare the window procedure
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-// Step 4: Define the entry point of the application
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    // Step 5: Initialize GDI+
     GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-    // Step 6: Register the window class
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -31,59 +26,74 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     wc.hInstance = hInstance;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.lpszClassName = g_WindowClassName;
+    wc.lpszClassName = GetWindowClassName();
     RegisterClassEx(&wc);
-    int a = 200;
 
-
-    // Step 7: Create the window
-    g_hwnd = CreateWindowEx(
+    HWND hwnd = CreateWindowEx(
         0,
-        g_WindowClassName,
+        GetWindowClassName(),
         "Blank Window",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        1100,
-        700,
+        800,
+        600,
         NULL,
         NULL,
         hInstance,
         NULL
     );
 
-
-    if (g_hwnd == NULL)
+    if (hwnd == NULL)
     {
         return 0;
     }
 
-    g_hButton = CreateWindow(
+    HWND hButton1 = CreateWindow(
         "BUTTON",
         "1",
         WS_CHILD | WS_VISIBLE,
-        55,
-        610,
-        25,
-        25,
-        g_hwnd,
+        50,
+        50,
+        50,
+        30,
+        hwnd,
         NULL,
         hInstance,
         NULL
     );
 
-    if (g_hButton == NULL)
+    if (hButton1 == NULL)
     {
         return 0;
     }
 
-    // Step 8: Show and update the window
-    ShowWindow(g_hwnd, nCmdShow);
-    UpdateWindow(g_hwnd);
+    HWND hButton2 = CreateWindow(
+        "BUTTON",
+        "2",
+        WS_CHILD | WS_VISIBLE,
+        120,
+        50,
+        50,
+        30,
+        hwnd,
+        NULL,
+        hInstance,
+        NULL
+    );
 
-    SetTimer(g_hwnd, 1, 10, NULL);  // Timer ID = 1, interval = 10 milliseconds
+    if (hButton2 == NULL)
+    {
+        return 0;
+    }
 
-    // Step 9: Enter the message loop
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(hButton1));
+
+    ShowWindow(hwnd, nCmdShow);
+    UpdateWindow(hwnd);
+
+    SetTimer(hwnd, 1, 16, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
+
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {
@@ -91,30 +101,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         DispatchMessage(&msg);
     }
 
-    KillTimer(g_hwnd, 1);
+    KillTimer(hwnd, 1);  // Stop the timer
 
-    // Step 10: Shutdown GDI+
     GdiplusShutdown(gdiplusToken);
-
-    // Step 11: Unregister the window class
-    UnregisterClass(g_WindowClassName, hInstance);
 
     return static_cast<int>(msg.wParam);
 }
 
-// Step 12: Define the window procedure
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static int a = 200;
+    static bool isButton1Clicked = false;
 
-    static bool isButton1Clicked = false;  // Flag variable to track Button 1 click event
+    HWND hButton1 = reinterpret_cast<HWND>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
     switch (uMsg)
     {
     case WM_COMMAND:
-        if (lParam == (LPARAM)g_hButton)  // Check if the button was clicked
+        if (lParam == (LPARAM)hButton1)
         {
-            isButton1Clicked = true;  // Set the flag to true
+
+            isButton1Clicked = true;  // Set the flag indicating Button 1 was clicked
+        }
+        else if (lParam == (LPARAM)GetDlgItem(hwnd, 2))  // Check if Button 2 was clicked
+        {
             MessageBox(hwnd, "Button 2 was clicked!", "Button Clicked", MB_OK | MB_ICONINFORMATION);
         }
         break;
@@ -124,37 +134,33 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         HDC hdc = BeginPaint(hwnd, &ps);
 
         Graphics graphics(hdc);
-        Pen pen(Color(255, 0, 0, 0));  // Create a black pen
-        Pen pen1(Color(255, 255, 255, 255));
+        Pen pen(Color(255, 0, 0, 0));
 
-       
+
         graphics.DrawRectangle(&pen, 640, 40, 260, 700); // zewn
-        graphics.DrawRectangle(&pen, 650, a - 150, 240, 150); // �rodek
+        graphics.DrawRectangle(&pen, 650, a - 150, 240, 150); // œrodek
         graphics.DrawLine(&pen, 900, 200, 1490, 200);
         graphics.DrawLine(&pen, 50, 350, 640, 350);
-        graphics.DrawLine(&pen, 900, 500, 1490, 500); 
+        graphics.DrawLine(&pen, 900, 500, 1490, 500);
         graphics.DrawLine(&pen, 50, 650, 640, 650);
 
-
         EndPaint(hwnd, &ps);
-       
         return 0;
     }
     case WM_TIMER:
-        if (isButton1Clicked)  // Move the elevator only when Button 1 is clicked
+        if (isButton1Clicked && a < 650)  // Move the line only if Button 1 was clicked
         {
-            // Update the elevator coordinates
             a += 1;
-
-            // Redraw the window
             InvalidateRect(hwnd, NULL, TRUE);
             UpdateWindow(hwnd);
         }
-        return 0;
+        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
+
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
