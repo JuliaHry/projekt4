@@ -100,7 +100,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
-    SetTimer(hwnd, 1, 150, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
+    SetTimer(hwnd, 1, 30, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
@@ -131,18 +131,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     static bool isButton10Clicked = false;
     static bool isButton11Clicked = false;
     static bool isButton12Clicked = false;
+
+   
     static bool goTo1 = false;
     static bool goTo2 = false;
     static bool goTo3 = false;
     static bool goTo4 = false;
 
+
+    static bool elevatorEmpty = true;
     static std::vector<int> firstFloorPeople;
     static std::vector<int> secondFloorPeople;
     static std::vector<int> thirdFloorPeople;
     static std::vector<int> fourthFloorPeople;
     static std::vector<int> inElevator;
     static std::vector<int> Calls;
-    static int goTo = 1;
+    static int goTo = 4;
+
+    static int afloor1 = 650;
+    static int afloor2 = 500;
+    static int afloor3 = 350;
+    static int afloor4 = 200;
 
     HWND hButton1 = reinterpret_cast<HWND>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
@@ -289,7 +298,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < inElevator.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i, 20.0f);
+            Gdiplus::PointF point(20.0f * i, 300.0f);
             wchar_t text[2];
             swprintf_s(text, L"%d", inElevator[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
@@ -299,165 +308,320 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         EndPaint(hwnd, &ps);
         return 0;
     }
-    case WM_TIMER:
-        if (isButton1Clicked || isButton2Clicked || isButton3Clicked)
+    case WM_TIMER: // NA RAZIE NIE MASZ USTAWIONEGO GO TO
+        if (a == afloor1)
         {
-            if (a < 650)
+            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 1 piętrze
             {
-                a += 1;
-                InvalidateRect(hwnd, NULL, TRUE);
-                UpdateWindow(hwnd);
+                for (int i = 0; i < inElevator.size(); i++)
+                {
+                    if (inElevator[i] == 1)
+                    {
+                        inElevator.erase(inElevator.begin() + i);
+                        i = 0;
+                    }  
+                }
             }
-            else
+                if (firstFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
+                {
+                    for (int i = 0; i < firstFloorPeople.size(); i++) // wrzucamy wszystkich ludzi czekających na 1 piętrze do windy, tu przerzucamy całość, bo to najniższe piętro, na środkowych piętrach trzeba to będzie pilnować
+                    {
+                        inElevator.push_back(firstFloorPeople[i]);
+                    }
+                    firstFloorPeople.clear(); // usuwamy ludzi z pierwszego piętra
+                    for (int i = 0; i < Calls.size(); i++) // z zawołań usuwamy te z pierwszego piętra
+                    {
+                        if (Calls[i] == 1 || Calls[i] == 2 || Calls[i] == 3)
+                        {
+                            Calls.erase(Calls.begin() + i);
+                            i = 0;
+                        }
+                    }
+                    if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
+                    {
+                        if (Calls.size() != 0)
+                        {
+                            if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                                goTo = 1;
+                            else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                                goTo = 2;
+                            else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                                goTo = 3;
+                            else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                                goTo = 4;
+                        }
+                    }
+                    for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                    {
+                        if (inElevator[i] > goTo) goTo = inElevator[i];
+                    }
+                
+            }
+            else break;
+        }
+        else if (a == afloor2)
+        {
+            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 2 piętrze
             {
-                if (isButton1Clicked)
+                for (int i = 0; i < inElevator.size(); i++)
                 {
-                    isButton1Clicked = false;
-                    goTo2 = true;
+                    if (inElevator[i] == 2)
+                    {
+                        inElevator.erase(inElevator.begin() + i);
+                        i = 0;
+                    }
+                        
                 }
-                else if (isButton2Clicked)
+            }
+            if (goTo == 2) // teraz musi się ustalić nowe goTo
+            {
+                if (Calls.size() != 0) // po pierwsze czy ktoś zawołał. Jak tak: na goTonastawiamy tego, który zawołał. Potem, jeżeli goTo>2 sprawdzamy, czy jest w windzie ktoś, kto chce jechać jeszcze wyżej
                 {
-                    isButton2Clicked = false;
-                    goTo3 = true;
+                    if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                        goTo = 1;
+                    else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                        goTo = 2;
+                    else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                        goTo = 3;
+                    else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                        goTo = 4;
+
+                    if (goTo > 2)
+                        for (int i = 0; i < inElevator.size(); i++)
+                        {
+                            if (inElevator[i] > goTo) goTo = inElevator[i];
+                        }
                 }
-                else if (isButton3Clicked)
+                else if (inElevator.size() != 0) // jeżeli nikt nie zawołał, to wybieramy pierwszą osobę z windy jako goTo, a jeżeli będzie to liczba większa, niż 2, to sprawdzamy, czy jest ktoś kto chce jechać jeszcze wyżej i nastawiamy goTo na to
                 {
-                    isButton3Clicked = false;
-                    goTo4 = true;
-                } 
+                    inElevator[0] = goTo;
+                    if (goTo > 2)
+                    {
+                        for (int i = 0; i < inElevator.size(); i++)
+                        {
+                            if (inElevator[i] > goTo) goTo = inElevator[i];
+                        }
+                    }
+                }
+            }
+            if (secondFloorPeople.size() != 0)
+            {
+                if (goTo == 1) // gdy goTo to 1 - wrzucamy ludzi z 2 piętra chcących jechać na 1 piętro do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy
+                {
+                    for (int i = 0; i < secondFloorPeople.size(); i++)
+                    {
+                        if (secondFloorPeople[i] == 1)
+                        {
+                            secondFloorPeople.erase(secondFloorPeople.begin() + i);
+                            inElevator.push_back(1);
+                            i = 0;
+                        }
+
+                    }
+                    for (int i = 0; i < Calls.size(); i++)
+                        if (Calls[i] == 4)
+                        {
+                            Calls.erase(Calls.begin() + i);
+                            i = 0;
+                        }  
+                }
+                else if (goTo > 2) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
+                {
+                    for (int i = 0; i < secondFloorPeople.size(); i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
+                    {
+                        if (secondFloorPeople[i] == 3 || secondFloorPeople[i] == 4) 
+                        {
+                            if (secondFloorPeople[i] == 4 && goTo == 3) goTo == 4;
+                            inElevator.push_back(secondFloorPeople[i]);
+                            secondFloorPeople.erase(secondFloorPeople.begin() + i);
+                            i = 0;
+                        }
+                    }
+                    for (int i = 0; i < Calls.size(); i++)
+                        if (Calls[i] == 5 || Calls[i] == 6)
+                        {
+                            Calls.erase(Calls.begin() + i);
+                            i = 0;
+                        }
+                }
             }
         }
-        else if (isButton4Clicked || isButton5Clicked || isButton6Clicked)
+        else if (a == afloor3)
         {
-            if (a < 500)
+            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 3 piętrze
+            {
+                for (int i = 0; i < inElevator.size(); i++)
+                {
+                    if (inElevator[i] == 3)
+                    {
+                        inElevator.erase(inElevator.begin() + i);
+                        i = 0;
+                    }
+                }
+            }
+            if (goTo == 3) // teraz musi się ustalić nowe goTo
+            {
+                if (Calls.size() != 0) // po pierwsze czy ktoś zawołał. Jak tak: na goTonastawiamy tego, który zawołał. Potem, jeżeli goTo>2 sprawdzamy, czy jest w windzie ktoś, kto chce jechać jeszcze wyżej
+                {
+                    if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                        goTo = 1;
+                    else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                        goTo = 2;
+                    else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                        goTo = 3;
+                    else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                        goTo = 4;
+
+                    if (goTo < 3) // jeżeli goTo < 3, to jeżeli w windzie jest ktoś, kto chce jechać jeszcze niżej (czyli jak go to to 2, a w windzie jest ktoś, kto chce jechać na 1), to ustawiamy nowe goTo na 1;
+                        for (int i = 0; i < inElevator.size(); i++)
+                        {
+                            if (inElevator[i] < goTo) goTo = inElevator[i];
+                        }
+                }
+                else if (inElevator.size() != 0) // jeżeli nikt nie zawołał, to wybieramy pierwszą osobę z windy jako goTo, a jeżeli będzie to liczba większa, niż 2, to sprawdzamy, czy jest ktoś kto chce jechać jeszcze wyżej i nastawiamy goTo na to
+                {
+                    inElevator[0] = goTo;
+                    if (goTo < 3)
+                    {
+                        for (int i = 0; i < inElevator.size(); i++)
+                        {
+                            if (inElevator[i] < goTo) goTo = inElevator[i];
+                        }
+                    }
+                }
+            }
+            if (thirdFloorPeople.size() != 0)
+            {
+                if (goTo == 4) // gdy goTo to 1 - wrzucamy ludzi z 2 piętra chcących jechać na 1 piętro do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy
+                {
+                    for (int i = 0; i < thirdFloorPeople.size(); i++)
+                    {
+                        if (thirdFloorPeople[i] == 4)
+                        {
+                            thirdFloorPeople.erase(thirdFloorPeople.begin() + i);
+                            inElevator.push_back(4);
+                            i = 0;
+                        }
+
+                    }
+                    for (int i = 0; i < Calls.size(); i++)
+                        if (Calls[i] == 9)
+                        {
+                            Calls.erase(Calls.begin() + i);
+                            i = 0;
+                        }
+                }
+                else if (goTo < 3) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
+                {
+                    for (int i = 0; i < thirdFloorPeople.size(); i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
+                    {
+                        if (thirdFloorPeople[i] == 1 || thirdFloorPeople[i] == 2)
+                        {
+                            if (thirdFloorPeople[i] == 1 && goTo == 2) goTo == 1;
+                            inElevator.push_back(thirdFloorPeople[i]);
+                            thirdFloorPeople.erase(thirdFloorPeople.begin() + i);
+                            i = 0;
+                        }
+                    }
+                    for (int i = 0; i < Calls.size(); i++)
+                        if (Calls[i] == 7 || Calls[i] == 8)
+                        {
+                            Calls.erase(Calls.begin() + i);
+                            i = 0;
+                        }
+                }
+            }
+        }
+        if (a == afloor4)
+        {
+            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 1 piętrze
+            {
+                for (int i = 0; i < inElevator.size(); i++)
+                {
+                    if (inElevator[i] == 4)
+                    {
+                        inElevator.erase(inElevator.begin() + i);
+                        i = 0;
+                    }
+                }
+            }
+            if (fourthFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
+            {
+                for (int i = 0; i < fourthFloorPeople.size(); i++) // wrzucamy wszystkich ludzi czekających na 1 piętrze do windy, tu przerzucamy całość, bo to najniższe piętro, na środkowych piętrach trzeba to będzie pilnować
+                {
+                    inElevator.push_back(fourthFloorPeople[i]);
+                }
+                fourthFloorPeople.clear(); // usuwamy ludzi z pierwszego piętra
+                for (int i = 0; i < Calls.size(); i++) // z zawołań usuwamy te z pierwszego piętra
+                {
+                    if (Calls[i] == 10 || Calls[i] == 11 || Calls[i] == 12)
+                    {
+                        Calls.erase(Calls.begin() + i);
+                        i = 0;
+                    } 
+                }
+                if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
+                {
+                    if (Calls.size() != 0) 
+                    {
+                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                            goTo = 1;
+                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                            goTo = 2;
+                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                            goTo = 3;
+                        else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                            goTo = 4;
+                    }
+                }
+                for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                {
+                    if (inElevator[i] < goTo) goTo = inElevator[i];
+                }
+            }
+        }
+        if (goTo == 1)
+        {
+            if (a < afloor1)
+            { 
+                a+=1;
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
+            }
+        }
+        if (goTo == 2)
+        {
+            if (a < afloor2)
             {
                 a += 1;
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
-            else if (a > 500) {
+            else if (a > afloor2)
+            {
                 a -= 1;
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
-            } 
-            else {
-                if (isButton4Clicked)
-                {
-                    isButton4Clicked = false;
-                    goTo1 = true;
-                }
-                else if (isButton5Clicked)
-                {
-                    isButton5Clicked = false;
-                    goTo3 = true;
-                }
-                else if (isButton6Clicked)
-                {
-                    isButton6Clicked = false;
-                    goTo4 = true;
-                }
             }
         }
-        else if (isButton7Clicked || isButton8Clicked || isButton9Clicked)
+        if (goTo == 3)
         {
-            if (a < 350) {
-                a += 1;
-                InvalidateRect(hwnd, NULL, TRUE);
-                UpdateWindow(hwnd);
-            }
-            else if (a > 350) {
-                a -= 1;
-                InvalidateRect(hwnd, NULL, TRUE);
-                UpdateWindow(hwnd);
-            }
-            else {
-                if (isButton7Clicked)
-                {
-                    isButton7Clicked = false;
-                    goTo1 = true;
-                }
-                else if (isButton8Clicked)
-                {
-                    isButton8Clicked = false;
-                    goTo2 = true;
-                }
-                else if (isButton9Clicked)
-                {
-                    isButton9Clicked = false;
-                    goTo4 = true;
-                }
-            }
-        }
-        else if (isButton10Clicked || isButton11Clicked || isButton12Clicked)
-        {
-            if (a > 200)
-            {
-                a -= 1;
-                InvalidateRect(hwnd, NULL, TRUE);
-                UpdateWindow(hwnd);
-            }
-            else {
-                if (isButton10Clicked)
-                {
-                    isButton10Clicked = false;
-                    goTo1 = true;
-                }
-                else if (isButton11Clicked)
-                {
-                    isButton11Clicked = false;
-                    goTo2 = true;
-                }
-                else if (isButton12Clicked)
-                {
-                    isButton12Clicked = false;
-                    goTo3 = true;
-                }
-            }
-        }
-        else if (goTo1)
-        {
-            if (a < 650)
+            if (a < afloor3)
             {
                 a += 1;
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
-            else goTo1 = false;
-        }
-        else if (goTo2)
-        {
-            if (a > 500)
+            else if (a > afloor3)
             {
                 a -= 1;
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
-            else if (a < 500)
-            {
-                a += 1;
-                InvalidateRect(hwnd, NULL, TRUE);
-                UpdateWindow(hwnd);
-            }
-            else goTo2 = false;
         }
-        else if (goTo3)
+        if (goTo == 4)
         {
-            if (a > 350)
-            {
-                a -= 1;
-                InvalidateRect(hwnd, NULL, TRUE);
-                UpdateWindow(hwnd);
-            }
-            else if (a < 350)
-            {
-                a += 1;
-                InvalidateRect(hwnd, NULL, TRUE);
-                UpdateWindow(hwnd);
-            }
-        }
-        else if (goTo4)
-        {
-            if (a > 200)
+            if (a > afloor4)
             {
                 a -= 1;
                 InvalidateRect(hwnd, NULL, TRUE);
@@ -471,6 +635,5 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
-
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
