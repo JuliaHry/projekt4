@@ -119,25 +119,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     static int a = 200;
-    static bool isButton1Clicked = false;
-    static bool isButton2Clicked = false;
-    static bool isButton3Clicked = false;
-    static bool isButton4Clicked = false;
-    static bool isButton5Clicked = false;
-    static bool isButton6Clicked = false;
-    static bool isButton7Clicked = false;
-    static bool isButton8Clicked = false;
-    static bool isButton9Clicked = false;
-    static bool isButton10Clicked = false;
-    static bool isButton11Clicked = false;
-    static bool isButton12Clicked = false;
-
-   
-    static bool goTo1 = false;
-    static bool goTo2 = false;
-    static bool goTo3 = false;
-    static bool goTo4 = false;
-
+    static bool toGo1 = false;
+    static bool toGo2 = false;
+    static bool toGo3 = false;
+    static bool toGo4 = false;
 
     static bool elevatorEmpty = true;
     static std::vector<int> firstFloorPeople;
@@ -163,73 +148,61 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             switch (LOWORD(wParam))
             {
             case 1: {
-                isButton1Clicked = true;
                 firstFloorPeople.push_back(2);
                 Calls.push_back(1);
             }
                 break;
             case 2: {
-                isButton2Clicked = true;
                 firstFloorPeople.push_back(3);
                 Calls.push_back(2);
             }
                 break;
             case 3: {
-                isButton3Clicked = true;
                 firstFloorPeople.push_back(4);
                 Calls.push_back(3);
             }
                 break;
             case 4: {
-                isButton4Clicked = true;
                 secondFloorPeople.push_back(1);
                 Calls.push_back(4);
             }
                 break;
             case 5: {
-                isButton5Clicked = true;
                 secondFloorPeople.push_back(3);
                 Calls.push_back(5);
             }
                 break;
             case 6: {
-                isButton6Clicked = true;
                 secondFloorPeople.push_back(4);
                 Calls.push_back(6);
             }
                 break;
             case 7: {
-                isButton7Clicked = true;
                 thirdFloorPeople.push_back(1);
                 Calls.push_back(7);
             }
                 break;
             case 8: {
-                isButton8Clicked = true;
                 thirdFloorPeople.push_back(2);
                 Calls.push_back(8);
             }
                 break;
             case 9: {
-                isButton9Clicked = true;
                 thirdFloorPeople.push_back(4);
                 Calls.push_back(9);
             }
                 break;
             case 10: {
-                isButton10Clicked = true;
                 fourthFloorPeople.push_back(1);
                 Calls.push_back(10);
             }
                 break;
             case 11: {
-                isButton11Clicked = true;
                 fourthFloorPeople.push_back(2);
                 Calls.push_back(11);
             }
                 break;
             case 12: {
-                isButton12Clicked = true;
                 fourthFloorPeople.push_back(3);
                 Calls.push_back(12);
             }
@@ -308,9 +281,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         EndPaint(hwnd, &ps);
         return 0;
     }
-    case WM_TIMER: // NA RAZIE NIE MASZ USTAWIONEGO GO TO
+    case WM_TIMER:
         if (a == afloor1)
-        {
+        { 
+            
             if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 1 piętrze
             {
                 for (int i = 0; i < inElevator.size(); i++)
@@ -319,10 +293,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     {
                         inElevator.erase(inElevator.begin() + i);
                         i = 0;
-                    }  
+                    }
                 }
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
             }
-                if (firstFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
+            if (firstFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
                 {
                     for (int i = 0; i < firstFloorPeople.size(); i++) // wrzucamy wszystkich ludzi czekających na 1 piętrze do windy, tu przerzucamy całość, bo to najniższe piętro, na środkowych piętrach trzeba to będzie pilnować
                     {
@@ -357,7 +333,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     }
                 
             }
-            else break;
+            else if (firstFloorPeople.size() == 0)
+            {
+                if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
+                {
+                    if (Calls.size() != 0)
+                    {
+                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                            goTo = 1;
+                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                            goTo = 2;
+                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                            goTo = 3;
+                        else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                            goTo = 4;
+                    }
+                }
+                for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                {
+                    if (inElevator[i] > goTo) goTo = inElevator[i];
+                }
+            }
         }
         else if (a == afloor2)
         {
@@ -372,6 +368,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     }
                         
                 }
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
             }
             if (goTo == 2) // teraz musi się ustalić nowe goTo
             {
@@ -431,7 +429,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     {
                         if (secondFloorPeople[i] == 3 || secondFloorPeople[i] == 4) 
                         {
-                            if (secondFloorPeople[i] == 4 && goTo == 3) goTo == 4;
+                            if (secondFloorPeople[i] == 4 && goTo == 3) goTo = 4;
                             inElevator.push_back(secondFloorPeople[i]);
                             secondFloorPeople.erase(secondFloorPeople.begin() + i);
                             i = 0;
@@ -458,6 +456,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         i = 0;
                     }
                 }
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
             }
             if (goTo == 3) // teraz musi się ustalić nowe goTo
             {
@@ -517,7 +517,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     {
                         if (thirdFloorPeople[i] == 1 || thirdFloorPeople[i] == 2)
                         {
-                            if (thirdFloorPeople[i] == 1 && goTo == 2) goTo == 1;
+                            if (thirdFloorPeople[i] == 1 && goTo == 2) goTo = 1;
                             inElevator.push_back(thirdFloorPeople[i]);
                             thirdFloorPeople.erase(thirdFloorPeople.begin() + i);
                             i = 0;
@@ -544,6 +544,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         i = 0;
                     }
                 }
+                InvalidateRect(hwnd, NULL, TRUE);
+                UpdateWindow(hwnd);
             }
             if (fourthFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
             {
