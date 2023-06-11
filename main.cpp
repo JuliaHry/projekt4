@@ -328,6 +328,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                             return false;
                         }),
                         Calls.end());
+                    count1 = 0;
+                    deleted2 = 0;
                     Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
                         [&count2](int value) {
                             if (value == 2 && count2 < deleted3) {
@@ -337,6 +339,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                             return false;
                         }),
                         Calls.end());
+                    count2 = 0;
+                    deleted3 = 0;
                     Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
                         [&count3](int value) {
                             if (value == 3 && count3 < deleted4) {
@@ -346,6 +350,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                             return false;
                         }),
                         Calls.end());
+                    count3 = 0;
+                    deleted4 = 0;
                     if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
                     {
                         if (Calls.size() != 0)
@@ -439,30 +445,92 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 if (goTo == 1) // gdy goTo to 1 - wrzucamy ludzi z 2 piętra chcących jechać na 1 piętro do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy
                 {
-                    for (int i = 0; i < secondFloorPeople.size(); i++)
+                    for (int i = 0; i < secondFloorPeople.size() && inElevator.size() < 10; i++)
                     {
                         if (secondFloorPeople[i] == 1)
                         {
+                            toDelete += 1;
                             inElevator.push_back(1);
                         }
                     }
-                    secondFloorPeople.erase(std::remove(secondFloorPeople.begin(), secondFloorPeople.end(), 1), secondFloorPeople.end());
-                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 4), Calls.end());
+                    secondFloorPeople.erase(std::remove_if(secondFloorPeople.begin(), secondFloorPeople.end(),
+                        [&count1](int value) {
+                            if (value == 1 && count1 < toDelete) {
+                                ++count1;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        secondFloorPeople.end());
+                    count1 = 0;
+                    Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                        [&count1](int value) {
+                            if (value == 4 && count1 < toDelete) {
+                                ++count1;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        Calls.end());
+                    count1 = 0;
+                    toDelete = 0;
                 }
                 else if (goTo > 2) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
                 {
-                    for (int i = 0; i < secondFloorPeople.size(); i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
+                    deleted3 = 0;
+                    deleted4 = 0;
+                    for (int i = 0; i < secondFloorPeople.size() && inElevator.size() < 10; i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
                     {
                         if (secondFloorPeople[i] == 3 || secondFloorPeople[i] == 4) 
                         {
                             if (secondFloorPeople[i] == 4 && goTo == 3) goTo = 4;
                             inElevator.push_back(secondFloorPeople[i]);
+                            if (secondFloorPeople[i] == 3) deleted3 += 1;
+                            if (secondFloorPeople[i] == 4) deleted4 += 1;
                         }
                     }
-                    secondFloorPeople.erase(std::remove(secondFloorPeople.begin(), secondFloorPeople.end(), 3), secondFloorPeople.end());
-                    secondFloorPeople.erase(std::remove(secondFloorPeople.begin(), secondFloorPeople.end(), 4), secondFloorPeople.end());
-                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 5), Calls.end());
-                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 6), Calls.end());
+                    secondFloorPeople.erase(std::remove_if(secondFloorPeople.begin(), secondFloorPeople.end(),
+                        [&count2](int value) {
+                            if (value == 3 && count2 < deleted3) {
+                                ++count2;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        secondFloorPeople.end());
+                    count2 = 0;
+                    secondFloorPeople.erase(std::remove_if(secondFloorPeople.begin(), secondFloorPeople.end(),
+                        [&count2](int value) {
+                            if (value == 4 && count2 < deleted4) {
+                                ++count2;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        secondFloorPeople.end());
+                    count2 = 0;
+                    Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                        [&count3](int value) {
+                            if (value == 5 && count3 < deleted3) {
+                                ++count3;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        Calls.end());
+                    count3 = 0;
+                    Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                        [&count1](int value) {
+                            if (value == 6 && count1 < deleted4) {
+                                ++count1;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        Calls.end());
+                    count1 = 0;
+                    deleted3 = 0;
+                    deleted4 = 0;
                 }
             }
         }
