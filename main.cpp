@@ -225,13 +225,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         graphics.DrawLine(&pen, 50, 650, 640, 650);
 
         // Set the font and brush for drawing text
-        Gdiplus::Font font(L"Arial", 10);
+        Gdiplus::Font font(L"Arial", 20);
         Gdiplus::SolidBrush brush(Gdiplus::Color::Black);
 
 
         for (int i = 0; i < firstFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i, 110.0f);
+            Gdiplus::PointF point(30.0f * i + 100, 600.0f);
             wchar_t text[2];
             swprintf_s(text, L"%d", firstFloorPeople[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
@@ -239,7 +239,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < secondFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i, 80.0f);
+            Gdiplus::PointF point(30.0f * i + 930, 450.0f);
             wchar_t text[2];
             swprintf_s(text, L"%d", secondFloorPeople[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
@@ -247,7 +247,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < thirdFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i, 50.0f);
+            Gdiplus::PointF point(30.0f * i + 100, 300.0f);
             wchar_t text[2];
             swprintf_s(text, L"%d", thirdFloorPeople[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
@@ -255,7 +255,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < fourthFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i, 20.0f);
+            Gdiplus::PointF point(30.0f * i + 930, 150.0f);
             wchar_t text[2];
             swprintf_s(text, L"%d", fourthFloorPeople[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
@@ -263,7 +263,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < Calls.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i, 200.0f);
+            Gdiplus::PointF point(40.0f * i, 200.0f);
             wchar_t text[3];
             swprintf_s(text, L"%d", Calls[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
@@ -271,11 +271,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < inElevator.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i, 300.0f);
+            Gdiplus::PointF point(20.0f * i + 650, a - 50.0f );
             wchar_t text[2];
             swprintf_s(text, L"%d", inElevator[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
         }
+
+            Gdiplus::PointF point(20.0f, 400.0f);
+            wchar_t text[2];
+            swprintf_s(text, L"%d", goTo);
+            graphics.DrawString(text, -1, &font, point, &brush);
         
 
         EndPaint(hwnd, &ps);
@@ -317,13 +322,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     {
                         if (Calls.size() != 0)
                         {
-                            if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
-                                goTo = 1;
-                            else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                            if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 1)
                                 goTo = 2;
-                            else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                            else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 2)
                                 goTo = 3;
-                            else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                            else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12 || Calls[0] == 3)
                                 goTo = 4;
                         }
                     }
@@ -339,13 +342,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 {
                     if (Calls.size() != 0)
                     {
-                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
-                            goTo = 1;
-                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                        if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 1)
                             goTo = 2;
-                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 2)
                             goTo = 3;
-                        else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                        else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12 || Calls[0] == 3)
                             goTo = 4;
                     }
                 }
@@ -365,8 +366,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     {
                         inElevator.erase(inElevator.begin() + i);
                         i = 0;
-                    }
-                        
+                    } 
                 }
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
@@ -375,29 +375,30 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 if (Calls.size() != 0) // po pierwsze czy ktoś zawołał. Jak tak: na goTonastawiamy tego, który zawołał. Potem, jeżeli goTo>2 sprawdzamy, czy jest w windzie ktoś, kto chce jechać jeszcze wyżej
                 {
-                    if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                    if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 4)
                         goTo = 1;
-                    else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
-                        goTo = 2;
-                    else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                    else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 5)
                         goTo = 3;
-                    else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                    else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12 || Calls[0] == 6)
                         goTo = 4;
 
-                    if (goTo > 2)
+                    if (goTo == 3)
                         for (int i = 0; i < inElevator.size(); i++)
                         {
-                            if (inElevator[i] > goTo) goTo = inElevator[i];
+                            if (inElevator[i] == 4) goTo = 4;
                         }
                 }
-                else if (inElevator.size() != 0) // jeżeli nikt nie zawołał, to wybieramy pierwszą osobę z windy jako goTo, a jeżeli będzie to liczba większa, niż 2, to sprawdzamy, czy jest ktoś kto chce jechać jeszcze wyżej i nastawiamy goTo na to
+                else if (Calls.size() == 0) // jeżeli nikt nie zawołał, to wybieramy pierwszą osobę z windy jako goTo, a jeżeli będzie to liczba większa, niż 2, to sprawdzamy, czy jest ktoś kto chce jechać jeszcze wyżej i nastawiamy goTo na to
                 {
-                    inElevator[0] = goTo;
-                    if (goTo > 2)
+                    if (inElevator.size() != 0)
+                    {
+                        inElevator[0] = goTo;
+                    }
+                    if (goTo == 3)
                     {
                         for (int i = 0; i < inElevator.size(); i++)
                         {
-                            if (inElevator[i] > goTo) goTo = inElevator[i];
+                            if (inElevator[i] = 4) goTo = 4;
                         }
                     }
                 }
@@ -443,6 +444,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         }
                 }
             }
+            else if (secondFloorPeople.size() == 0)
+            {
+
+            }
         }
         else if (a == afloor3)
         {
@@ -463,13 +468,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 if (Calls.size() != 0) // po pierwsze czy ktoś zawołał. Jak tak: na goTonastawiamy tego, który zawołał. Potem, jeżeli goTo>2 sprawdzamy, czy jest w windzie ktoś, kto chce jechać jeszcze wyżej
                 {
-                    if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                    if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 7)
                         goTo = 1;
-                    else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                    else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 8)
                         goTo = 2;
-                    else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
-                        goTo = 3;
-                    else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                    else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12 || Calls[0] == 9)
                         goTo = 4;
 
                     if (goTo < 3) // jeżeli goTo < 3, to jeżeli w windzie jest ktoś, kto chce jechać jeszcze niżej (czyli jak go to to 2, a w windzie jest ktoś, kto chce jechać na 1), to ustawiamy nowe goTo na 1;
@@ -553,7 +556,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 {
                     inElevator.push_back(fourthFloorPeople[i]);
                 }
-                fourthFloorPeople.clear(); // usuwamy ludzi z pierwszego piętra
+                fourthFloorPeople.clear(); // usuwamy ludzi z czwartego piętra
                 for (int i = 0; i < Calls.size(); i++) // z zawołań usuwamy te z pierwszego piętra
                 {
                     if (Calls[i] == 10 || Calls[i] == 11 || Calls[i] == 12)
@@ -566,19 +569,36 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 {
                     if (Calls.size() != 0) 
                     {
-                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
                             goTo = 1;
-                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
                             goTo = 2;
-                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 12)
                             goTo = 3;
-                        else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
-                            goTo = 4;
                     }
                 }
                 for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
                 {
                     if (inElevator[i] < goTo) goTo = inElevator[i];
+                }
+            }
+            else if (fourthFloorPeople.size() == 0)
+            {
+                if (goTo == 4)
+                {
+                    if (Calls.size() != 0)
+                    {
+                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
+                            goTo = 1;
+                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
+                            goTo = 2;
+                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 12)
+                            goTo = 3;
+                    }
+                }
+                for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                {
+                    if (inElevator[i] > goTo) goTo = inElevator[i];
                 }
             }
         }
