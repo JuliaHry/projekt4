@@ -2,6 +2,7 @@
 #include <gdiplus.h>
 #include <string>
 #include <vector>
+#include<algorithm>
 
 using namespace Gdiplus;
 #pragma comment(lib, "gdiplus.lib") 
@@ -292,14 +293,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             
             if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 1 piętrze
             {
-                for (int i = 0; i < inElevator.size(); i++)
-                {
-                    if (inElevator[i] == 1)
-                    {
-                        inElevator.erase(inElevator.begin() + i);
-                        i = 0;
-                    }
-                }
+                inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 1), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
@@ -310,14 +304,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         inElevator.push_back(firstFloorPeople[i]);
                     }
                     firstFloorPeople.clear(); // usuwamy ludzi z pierwszego piętra
-                    for (int i = 0; i < Calls.size(); i++) // z zawołań usuwamy te z pierwszego piętra
-                    {
-                        if (Calls[i] == 1 || Calls[i] == 2 || Calls[i] == 3)
-                        {
-                            Calls.erase(Calls.begin() + i);
-                            i = 0;
-                        }
-                    }
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 1), Calls.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 2), Calls.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 3), Calls.end());
                     if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
                     {
                         if (Calls.size() != 0)
@@ -360,14 +349,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 2 piętrze
             {
-                for (int i = 0; i < inElevator.size(); i++)
-                {
-                    if (inElevator[i] == 2)
-                    {
-                        inElevator.erase(inElevator.begin() + i);
-                        i = 0;
-                    } 
-                }
+                inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 2), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
@@ -411,18 +393,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     {
                         if (secondFloorPeople[i] == 1)
                         {
-                            secondFloorPeople.erase(secondFloorPeople.begin() + i);
                             inElevator.push_back(1);
-                            i = 0;
                         }
-
                     }
-                    for (int i = 0; i < Calls.size(); i++)
-                        if (Calls[i] == 4)
-                        {
-                            Calls.erase(Calls.begin() + i);
-                            i = 0;
-                        }  
+                    secondFloorPeople.erase(std::remove(secondFloorPeople.begin(), secondFloorPeople.end(), 1), secondFloorPeople.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 4), Calls.end());
                 }
                 else if (goTo > 2) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
                 {
@@ -432,16 +407,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         {
                             if (secondFloorPeople[i] == 4 && goTo == 3) goTo = 4;
                             inElevator.push_back(secondFloorPeople[i]);
-                            secondFloorPeople.erase(secondFloorPeople.begin() + i);
-                            i = 0;
                         }
                     }
-                    for (int i = 0; i < Calls.size(); i++)
-                        if (Calls[i] == 5 || Calls[i] == 6)
-                        {
-                            Calls.erase(Calls.begin() + i);
-                            i = 0;
-                        }
+                    secondFloorPeople.erase(std::remove(secondFloorPeople.begin(), secondFloorPeople.end(), 3), secondFloorPeople.end());
+                    secondFloorPeople.erase(std::remove(secondFloorPeople.begin(), secondFloorPeople.end(), 4), secondFloorPeople.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 5), Calls.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 6), Calls.end());
                 }
             }
             else if (secondFloorPeople.size() == 0)
@@ -453,14 +424,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 3 piętrze
             {
-                for (int i = 0; i < inElevator.size(); i++)
-                {
-                    if (inElevator[i] == 3)
-                    {
-                        inElevator.erase(inElevator.begin() + i);
-                        i = 0;
-                    }
-                }
+                inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 3), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
@@ -501,18 +465,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     {
                         if (thirdFloorPeople[i] == 4)
                         {
-                            thirdFloorPeople.erase(thirdFloorPeople.begin() + i);
                             inElevator.push_back(4);
-                            i = 0;
                         }
-
                     }
-                    for (int i = 0; i < Calls.size(); i++)
-                        if (Calls[i] == 9)
-                        {
-                            Calls.erase(Calls.begin() + i);
-                            i = 0;
-                        }
+                    thirdFloorPeople.erase(std::remove(thirdFloorPeople.begin(), thirdFloorPeople.end(), 4), thirdFloorPeople.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 9), Calls.end());
                 }
                 else if (goTo < 3) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
                 {
@@ -522,16 +479,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         {
                             if (thirdFloorPeople[i] == 1 && goTo == 2) goTo = 1;
                             inElevator.push_back(thirdFloorPeople[i]);
-                            thirdFloorPeople.erase(thirdFloorPeople.begin() + i);
-                            i = 0;
                         }
                     }
-                    for (int i = 0; i < Calls.size(); i++)
-                        if (Calls[i] == 7 || Calls[i] == 8)
-                        {
-                            Calls.erase(Calls.begin() + i);
-                            i = 0;
-                        }
+                    thirdFloorPeople.erase(std::remove(thirdFloorPeople.begin(), thirdFloorPeople.end(), 1), thirdFloorPeople.end());
+                    thirdFloorPeople.erase(std::remove(thirdFloorPeople.begin(), thirdFloorPeople.end(), 2), thirdFloorPeople.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 7), Calls.end());
+                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 8), Calls.end());
                 }
             }
         }
@@ -539,14 +492,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 1 piętrze
             {
-                for (int i = 0; i < inElevator.size(); i++)
-                {
-                    if (inElevator[i] == 4)
-                    {
-                        inElevator.erase(inElevator.begin() + i);
-                        i = 0;
-                    }
-                }
+                inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 4), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
@@ -557,14 +503,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     inElevator.push_back(fourthFloorPeople[i]);
                 }
                 fourthFloorPeople.clear(); // usuwamy ludzi z czwartego piętra
-                for (int i = 0; i < Calls.size(); i++) // z zawołań usuwamy te z pierwszego piętra
-                {
-                    if (Calls[i] == 10 || Calls[i] == 11 || Calls[i] == 12)
-                    {
-                        Calls.erase(Calls.begin() + i);
-                        i = 0;
-                    } 
-                }
+                Calls.erase(std::remove(Calls.begin(), Calls.end(), 10), Calls.end());
+                Calls.erase(std::remove(Calls.begin(), Calls.end(), 11), Calls.end());
+                Calls.erase(std::remove(Calls.begin(), Calls.end(), 12), Calls.end());
                 if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
                 {
                     if (Calls.size() != 0) 
