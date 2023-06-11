@@ -54,7 +54,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     );
 
 
-
     if (hwnd == NULL)
     {
         return 0;
@@ -101,7 +100,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
-    SetTimer(hwnd, 1, 16, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
+    SetTimer(hwnd, 1, 150, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
@@ -137,6 +136,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     static bool goTo3 = false;
     static bool goTo4 = false;
 
+    static std::vector<int> firstFloorPeople;
+    static std::vector<int> secondFloorPeople;
+    static std::vector<int> thirdFloorPeople;
+    static std::vector<int> fourthFloorPeople;
+    static std::vector<int> inElevator;
+    static std::vector<int> Calls;
+    static int goTo = 1;
+
     HWND hButton1 = reinterpret_cast<HWND>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
     switch (uMsg)
@@ -146,29 +153,77 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             switch (LOWORD(wParam))
             {
-            case 1: isButton1Clicked = true;
+            case 1: {
+                isButton1Clicked = true;
+                firstFloorPeople.push_back(2);
+                Calls.push_back(1);
+            }
                 break;
-            case 2: isButton2Clicked = true;
+            case 2: {
+                isButton2Clicked = true;
+                firstFloorPeople.push_back(3);
+                Calls.push_back(2);
+            }
                 break;
-            case 3: isButton3Clicked = true;
+            case 3: {
+                isButton3Clicked = true;
+                firstFloorPeople.push_back(4);
+                Calls.push_back(3);
+            }
                 break;
-            case 4: isButton4Clicked = true;
+            case 4: {
+                isButton4Clicked = true;
+                secondFloorPeople.push_back(1);
+                Calls.push_back(4);
+            }
                 break;
-            case 5: isButton5Clicked = true;
+            case 5: {
+                isButton5Clicked = true;
+                secondFloorPeople.push_back(3);
+                Calls.push_back(5);
+            }
                 break;
-            case 6: isButton6Clicked = true;
+            case 6: {
+                isButton6Clicked = true;
+                secondFloorPeople.push_back(4);
+                Calls.push_back(6);
+            }
                 break;
-            case 7: isButton7Clicked = true;
+            case 7: {
+                isButton7Clicked = true;
+                thirdFloorPeople.push_back(1);
+                Calls.push_back(7);
+            }
                 break;
-            case 8: isButton8Clicked = true;
+            case 8: {
+                isButton8Clicked = true;
+                thirdFloorPeople.push_back(2);
+                Calls.push_back(8);
+            }
                 break;
-            case 9: isButton9Clicked = true;
+            case 9: {
+                isButton9Clicked = true;
+                thirdFloorPeople.push_back(4);
+                Calls.push_back(9);
+            }
                 break;
-            case 10: isButton10Clicked = true;
+            case 10: {
+                isButton10Clicked = true;
+                fourthFloorPeople.push_back(1);
+                Calls.push_back(10);
+            }
                 break;
-            case 11: isButton11Clicked = true;
+            case 11: {
+                isButton11Clicked = true;
+                fourthFloorPeople.push_back(2);
+                Calls.push_back(11);
+            }
                 break;
-            case 12: isButton12Clicked = true;
+            case 12: {
+                isButton12Clicked = true;
+                fourthFloorPeople.push_back(3);
+                Calls.push_back(12);
+            }
                 break;
             }
         }
@@ -180,13 +235,66 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         Graphics graphics(hdc);
         Pen pen(Color(255, 0, 0, 0));
 
-
         graphics.DrawRectangle(&pen, 640, 40, 260, 700); // zewn
         graphics.DrawRectangle(&pen, 650, a - 150, 240, 150); // środek
         graphics.DrawLine(&pen, 900, 200, 1490, 200);
         graphics.DrawLine(&pen, 50, 350, 640, 350);
         graphics.DrawLine(&pen, 900, 500, 1490, 500);
         graphics.DrawLine(&pen, 50, 650, 640, 650);
+
+        // Set the font and brush for drawing text
+        Gdiplus::Font font(L"Arial", 10);
+        Gdiplus::SolidBrush brush(Gdiplus::Color::Black);
+
+
+        for (int i = 0; i < firstFloorPeople.size(); ++i)
+        {
+            Gdiplus::PointF point(20.0f * i, 110.0f);
+            wchar_t text[2];
+            swprintf_s(text, L"%d", firstFloorPeople[i]);
+            graphics.DrawString(text, -1, &font, point, &brush);
+        }
+
+        for (int i = 0; i < secondFloorPeople.size(); ++i)
+        {
+            Gdiplus::PointF point(20.0f * i, 80.0f);
+            wchar_t text[2];
+            swprintf_s(text, L"%d", secondFloorPeople[i]);
+            graphics.DrawString(text, -1, &font, point, &brush);
+        }
+
+        for (int i = 0; i < thirdFloorPeople.size(); ++i)
+        {
+            Gdiplus::PointF point(20.0f * i, 50.0f);
+            wchar_t text[2];
+            swprintf_s(text, L"%d", thirdFloorPeople[i]);
+            graphics.DrawString(text, -1, &font, point, &brush);
+        }
+
+        for (int i = 0; i < fourthFloorPeople.size(); ++i)
+        {
+            Gdiplus::PointF point(20.0f * i, 20.0f);
+            wchar_t text[2];
+            swprintf_s(text, L"%d", fourthFloorPeople[i]);
+            graphics.DrawString(text, -1, &font, point, &brush);
+        }
+
+        for (int i = 0; i < Calls.size(); ++i)
+        {
+            Gdiplus::PointF point(20.0f * i, 200.0f);
+            wchar_t text[3];
+            swprintf_s(text, L"%d", Calls[i]);
+            graphics.DrawString(text, -1, &font, point, &brush);
+        }
+
+        for (int i = 0; i < inElevator.size(); ++i)
+        {
+            Gdiplus::PointF point(20.0f * i, 20.0f);
+            wchar_t text[2];
+            swprintf_s(text, L"%d", inElevator[i]);
+            graphics.DrawString(text, -1, &font, point, &brush);
+        }
+        
 
         EndPaint(hwnd, &ps);
         return 0;
