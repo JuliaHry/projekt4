@@ -575,30 +575,92 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 if (goTo == 4) // gdy goTo to 1 - wrzucamy ludzi z 2 piętra chcących jechać na 1 piętro do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy
                 {
-                    for (int i = 0; i < thirdFloorPeople.size(); i++)
+                    for (int i = 0; i < thirdFloorPeople.size() && inElevator.size() < 10; i++)
                     {
                         if (thirdFloorPeople[i] == 4)
                         {
+                            toDelete += 1;
                             inElevator.push_back(4);
                         }
                     }
-                    thirdFloorPeople.erase(std::remove(thirdFloorPeople.begin(), thirdFloorPeople.end(), 4), thirdFloorPeople.end());
-                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 9), Calls.end());
+                    thirdFloorPeople.erase(std::remove_if(thirdFloorPeople.begin(), thirdFloorPeople.end(),
+                        [&count1](int value) {
+                            if (value == 4 && count1 < toDelete) {
+                                ++count1;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        thirdFloorPeople.end());
+                    count1 = 0;
+                    Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                        [&count1](int value) {
+                            if (value == 9 && count1 < toDelete) {
+                                ++count1;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        Calls.end());
+                    count1 = 0;
+                    toDelete = 0;
                 }
                 else if (goTo < 3) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
                 {
-                    for (int i = 0; i < thirdFloorPeople.size(); i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
+                    deleted1 = 0;
+                    deleted2 = 0;
+                    for (int i = 0; i < thirdFloorPeople.size() && inElevator.size() < 10; i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
                     {
                         if (thirdFloorPeople[i] == 1 || thirdFloorPeople[i] == 2)
                         {
                             if (thirdFloorPeople[i] == 1 && goTo == 2) goTo = 1;
                             inElevator.push_back(thirdFloorPeople[i]);
+                            if (thirdFloorPeople[i] == 1) deleted1 += 1;
+                            if (thirdFloorPeople[i] == 2) deleted2 += 1;
                         }
                     }
-                    thirdFloorPeople.erase(std::remove(thirdFloorPeople.begin(), thirdFloorPeople.end(), 1), thirdFloorPeople.end());
-                    thirdFloorPeople.erase(std::remove(thirdFloorPeople.begin(), thirdFloorPeople.end(), 2), thirdFloorPeople.end());
-                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 7), Calls.end());
-                    Calls.erase(std::remove(Calls.begin(), Calls.end(), 8), Calls.end());
+                    thirdFloorPeople.erase(std::remove_if(thirdFloorPeople.begin(), thirdFloorPeople.end(),
+                        [&count2](int value) {
+                            if (value == 1 && count2 < deleted1) {
+                                ++count2;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        thirdFloorPeople.end());
+                    count2 = 0;
+                    thirdFloorPeople.erase(std::remove_if(thirdFloorPeople.begin(), thirdFloorPeople.end(),
+                        [&count2](int value) {
+                            if (value == 2 && count2 < deleted2) {
+                                ++count2;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        thirdFloorPeople.end());
+                    count2 = 0;
+                    Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                        [&count3](int value) {
+                            if (value == 7 && count3 < deleted1) {
+                                ++count3;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        Calls.end());
+                    count3 = 0;
+                    Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                        [&count1](int value) {
+                            if (value == 8 && count1 < deleted2) {
+                                ++count1;
+                                return true;
+                            }
+                            return false;
+                        }),
+                        Calls.end());
+                    count1 = 0;
+                    deleted3 = 0;
+                    deleted4 = 0;
                 }
             }
         }
@@ -612,14 +674,50 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             if (fourthFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
             {
-                for (int i = 0; i < fourthFloorPeople.size(); i++) // wrzucamy wszystkich ludzi czekających na 1 piętrze do windy, tu przerzucamy całość, bo to najniższe piętro, na środkowych piętrach trzeba to będzie pilnować
+                for (int i = 0; i < fourthFloorPeople.size() && inElevator.size() < 10; i++) // wrzucamy wszystkich ludzi czekających na 1 piętrze do windy, tu przerzucamy całość, bo to najniższe piętro, na środkowych piętrach trzeba to będzie pilnować
                 {
+                    toDelete += 1;
                     inElevator.push_back(fourthFloorPeople[i]);
+                    if (fourthFloorPeople[i] == 1) deleted1 += 1;
+                    if (fourthFloorPeople[i] == 2) deleted2 += 1;
+                    if (fourthFloorPeople[i] == 3) deleted3 += 1;
+
                 }
-                fourthFloorPeople.clear(); // usuwamy ludzi z czwartego piętra
-                Calls.erase(std::remove(Calls.begin(), Calls.end(), 10), Calls.end());
-                Calls.erase(std::remove(Calls.begin(), Calls.end(), 11), Calls.end());
-                Calls.erase(std::remove(Calls.begin(), Calls.end(), 12), Calls.end());
+                fourthFloorPeople.erase(fourthFloorPeople.begin(), fourthFloorPeople.begin() + toDelete);
+                toDelete = 0;
+                Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                    [&count1](int value) {
+                        if (value == 10 && count1 < deleted1) {
+                            ++count1;
+                            return true;
+                        }
+                        return false;
+                    }),
+                    Calls.end());
+                count1 = 0;
+                deleted1 = 0;
+                Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                    [&count2](int value) {
+                        if (value == 11 && count2 < deleted2) {
+                            ++count2;
+                            return true;
+                        }
+                        return false;
+                    }),
+                    Calls.end());
+                count2 = 0;
+                deleted2 = 0;
+                Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
+                    [&count3](int value) {
+                        if (value == 12 && count3 < deleted3) {
+                            ++count3;
+                            return true;
+                        }
+                        return false;
+                    }),
+                    Calls.end());
+                count3 = 0;
+                deleted3 = 0;
                 if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
                 {
                     if (Calls.size() != 0) 
@@ -643,12 +741,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 {
                     if (Calls.size() != 0)
                     {
-                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
+                        if(fourthFloorPeople.size() != 0)
+                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
                             goTo = 1;
-                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
+                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 )
                             goTo = 2;
-                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 12)
+                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
                             goTo = 3;
+                    }
+                    if (Calls.size() == 0)
+                    {
+                        if (fourthFloorPeople.size() != 0)
+                            if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
+                                goTo = 1;
+                            else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
+                                goTo = 2;
+                            else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 12)
+                                goTo = 3;
                     }
                 }
                 for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
