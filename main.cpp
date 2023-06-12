@@ -718,40 +718,40 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     Calls.end());
                 count3 = 0;
                 deleted3 = 0;
-                if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
+                if (goTo == 4) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
                 {
-                    if (Calls.size() != 0) 
+                    if (Calls.size() != 0)
                     {
-                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
-                            goTo = 1;
-                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
-                            goTo = 2;
-                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 12)
-                            goTo = 3;
+                        if (fourthFloorPeople.size() != 0)
+                        {
+                            if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
+                                goTo = 1;
+                            else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                                goTo = 2;
+                            else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                                goTo = 3;
+                        }
+                        else if (fourthFloorPeople.size() == 0) {
+                            if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
+                                goTo = 1;
+                            else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
+                                goTo = 2;
+                            else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 12)
+                                goTo = 4;
+                        }
                     }
                 }
                 for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
                 {
                     if (inElevator[i] < goTo) goTo = inElevator[i];
                 }
-            }
+            } 
             else if (fourthFloorPeople.size() == 0)
             {
                 if (goTo == 4)
                 {
                     if (Calls.size() != 0)
                     {
-                        if(fourthFloorPeople.size() != 0)
-                        if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3)
-                            goTo = 1;
-                        else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 )
-                            goTo = 2;
-                        else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
-                            goTo = 3;
-                    }
-                    if (Calls.size() == 0)
-                    {
-                        if (fourthFloorPeople.size() != 0)
                             if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
                                 goTo = 1;
                             else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
@@ -762,7 +762,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 }
                 for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
                 {
-                    if (inElevator[i] > goTo) goTo = inElevator[i];
+                    if (inElevator[i] < goTo) goTo = inElevator[i];
                 }
             }
         }
