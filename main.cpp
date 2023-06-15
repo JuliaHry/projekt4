@@ -61,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
 
-    std::vector<ButtonData> buttons; // wektor guzików
+    std::vector<ButtonData> buttons;
     buttons.push_back({ 50, 615, "2", 1 });
     buttons.push_back({ 50, 580, "3", 2 });
     buttons.push_back({ 50, 545, "4", 3 });
@@ -100,7 +100,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
-    SetTimer(hwnd, 1, 1/16, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
+    SetTimer(hwnd, 1, 16, NULL); 
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
@@ -109,7 +109,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         DispatchMessage(&msg);
     }
 
-    KillTimer(hwnd, 1);  // Stop the timer
+    KillTimer(hwnd, 1); 
 
     GdiplusShutdown(gdiplusToken);
 
@@ -154,7 +154,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_COMMAND:
-        if (HIWORD(wParam) == BN_CLICKED)  // Check if button was clicked
+        if (HIWORD(wParam) == BN_CLICKED) 
         {
             switch (LOWORD(wParam))
             {
@@ -244,42 +244,58 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         for (int i = 0; i < firstFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(30.0f * i + 100, 600.0f);
+            Gdiplus::PointF point(600.0f  -30.0f * i, 600.0f);
             wchar_t text[2];
             swprintf_s(text, L"%d", firstFloorPeople[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
+            graphics.DrawRectangle(&pen, 600 - 30*i ,600, 23, 35);
+            graphics.DrawRectangle(&pen, 604 - 30 * i, 635, 15, 10);
+            graphics.DrawEllipse(&pen, 602-30 * i, 581, 18, 18);
         }
 
         for (int i = 0; i < secondFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(30.0f * i + 930, 450.0f);
+            Gdiplus::PointF point(30.0f * i + 920, 450.0f);
+
             wchar_t text[2];
             swprintf_s(text, L"%d", secondFloorPeople[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
+            graphics.DrawRectangle(&pen, 30 * i + 920, 450, 23, 35);
+            graphics.DrawRectangle(&pen, 30 * i + 924, 485, 15, 10);
+            graphics.DrawEllipse(&pen, 30 * i + 924, 431, 18, 18);
         }
 
         for (int i = 0; i < thirdFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(30.0f * i + 100, 300.0f);
+            Gdiplus::PointF point(600.0f - 30.0f * i, 300.0f);
             wchar_t text[2];
-            swprintf_s(text, L"%d", thirdFloorPeople[i]);
+            swprintf_s(text, L"%d", thirdFloorPeople[thirdFloorPeople.size() - i - 1]);
             graphics.DrawString(text, -1, &font, point, &brush);
+            graphics.DrawRectangle(&pen, 600 - 30 * i, 300, 23, 35);
+            graphics.DrawRectangle(&pen, 604 - 30 * i, 335, 15, 10);
+            graphics.DrawEllipse(&pen, 602 - 30 * i, 281, 18, 18);
         }
 
         for (int i = 0; i < fourthFloorPeople.size(); ++i)
         {
-            Gdiplus::PointF point(30.0f * i + 930, 150.0f);
+            Gdiplus::PointF point(30.0f * i + 920, 150.0f);
             wchar_t text[2];
             swprintf_s(text, L"%d", fourthFloorPeople[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
+            graphics.DrawRectangle(&pen, 30 * i + 920, 150, 23, 35);
+            graphics.DrawRectangle(&pen, 30 * i + 924, 185, 15, 10);
+            graphics.DrawEllipse(&pen, 30 * i + 924, 131, 18, 18);
         }
 
         for (int i = 0; i < inElevator.size(); ++i)
         {
-            Gdiplus::PointF point(20.0f * i + 650, a - 50.0f );
+            Gdiplus::PointF point(30.0f * i + 653, a - 50.0f );
             wchar_t text[2];
             swprintf_s(text, L"%d", inElevator[i]);
             graphics.DrawString(text, -1, &font, point, &brush);
+            graphics.DrawRectangle(&pen, 30 * i + 653, a - 50, 23, 35);
+            graphics.DrawRectangle(&pen, 30 * i + 657, a - 15, 15, 10);
+            graphics.DrawEllipse(&pen, 30 * i + 657, a - 69, 18, 18);
         }
 
 
