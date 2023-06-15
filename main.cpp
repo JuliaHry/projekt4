@@ -100,12 +100,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
-    SetTimer(hwnd, 1, 30, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
+    SetTimer(hwnd, 1, 1/16, NULL);  // Start the timer with 60 frames per second (1000ms / 60fps = 16ms per frame)
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {
-        TranslateMessage(&msg);
+        TranslateMessage(&msg); 
         DispatchMessage(&msg);
     }
 
@@ -146,7 +146,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     static int afloor1 = 650;
     static int afloor2 = 500;
-    static int afloor3 = 350;
+    static int afloor3 = 350; 
     static int afloor4 = 200;
 
     HWND hButton1 = reinterpret_cast<HWND>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
@@ -228,16 +228,18 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         Graphics graphics(hdc);
         Pen pen(Color(255, 0, 0, 0));
 
-        graphics.DrawRectangle(&pen, 640, 40, 260, 700); // zewn
-        graphics.DrawRectangle(&pen, 650, a - 150, 240, 150); // środek
+        graphics.DrawRectangle(&pen, 640, 40, 260, 700); 
+        graphics.DrawRectangle(&pen, 650, a - 150, 240, 150);
         graphics.DrawLine(&pen, 900, 200, 1490, 200);
         graphics.DrawLine(&pen, 50, 350, 640, 350);
         graphics.DrawLine(&pen, 900, 500, 1490, 500);
         graphics.DrawLine(&pen, 50, 650, 640, 650);
 
-        // Set the font and brush for drawing text
+
         Gdiplus::Font font(L"Arial", 20);
         Gdiplus::SolidBrush brush(Gdiplus::Color::Black);
+        Gdiplus::Font font1(L"Arial", 10);
+        Gdiplus::Font font2(L"Arial", 15);
 
 
         for (int i = 0; i < firstFloorPeople.size(); ++i)
@@ -280,18 +282,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             graphics.DrawString(text, -1, &font, point, &brush);
         }
 
-        for (int i = 0; i < Calls.size(); ++i)
-        {
-            Gdiplus::PointF point(40.0f * i, 200.0f);
-            wchar_t text[3];
-            swprintf_s(text, L"%d", Calls[i]);
-            graphics.DrawString(text, -1, &font, point, &brush);
-        }
 
-        Gdiplus::PointF point(20.0f, 400.0f);
-        wchar_t text[2];
-        swprintf_s(text, L"%d", goTo);
-        graphics.DrawString(text, -1, &font, point, &brush);
+        graphics.DrawRectangle(&pen, 645, 665, 250, 60);
+
+        graphics.DrawString(L"MASA PASAŻERÓW: ", -1, &font1, PointF(700.0f, 670.0f), &brush);
+
+        Gdiplus::PointF point1(750.0f, 690.0f);
+        wchar_t text1[4];
+        swprintf_s(text1, L"%d", inElevator.size()*70);
+        graphics.DrawString(text1, -1, &font2, point1, &brush);
+
 
 
         EndPaint(hwnd, &ps);
@@ -300,16 +300,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_TIMER:
         if (a == afloor1)
         { 
-            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 1 piętrze
+            if (inElevator.size() != 0)
             {
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 1), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
-            if (firstFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
+            if (firstFloorPeople.size() != 0) 
                 {
                 
-                    for (int i = 0; i < firstFloorPeople.size() && inElevator.size() < 10; i++) // wrzucamy wszystkich ludzi czekających na 1 piętrze do windy, tu przerzucamy całość, bo to najniższe piętro, na środkowych piętrach trzeba to będzie pilnować
+                    for (int i = 0; i < firstFloorPeople.size() && inElevator.size() < 8; i++)
                     {
                         toDelete += 1;
                         inElevator.push_back(firstFloorPeople[i]);
@@ -317,7 +317,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         if (firstFloorPeople[i] == 3) deleted3 += 1;
                         if (firstFloorPeople[i] == 4) deleted4 += 1;
                     }
-                    firstFloorPeople.erase(firstFloorPeople.begin(), firstFloorPeople.begin() + toDelete);// usuwamy ludzi z pierwszego piętra
+                    firstFloorPeople.erase(firstFloorPeople.begin(), firstFloorPeople.begin() + toDelete);
                     toDelete = 0;
                     Calls.erase(std::remove_if(Calls.begin(), Calls.end(),
                         [&count1](int value) {
@@ -352,7 +352,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         Calls.end());
                     count3 = 0;
                     deleted4 = 0;
-                    if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
+                    if (goTo == 1)
                     {
                         if (Calls.size() != 0)
                         {
@@ -375,7 +375,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                             }
                         }
                     }
-                    for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                    for (int i = 0; i < inElevator.size(); i++) 
                     {
                         if (inElevator[i] > goTo) goTo = inElevator[i];
                     }
@@ -383,7 +383,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             else if (firstFloorPeople.size() == 0)
             {
-                if (goTo == 1) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
+                if (goTo == 1)
                 {
                     if (Calls.size() != 0)
                     {
@@ -395,7 +395,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                             goTo = 4;
                     }
                 }
-                for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                for (int i = 0; i < inElevator.size(); i++) 
                 {
                     if (inElevator[i] > goTo) goTo = inElevator[i];
                 }
@@ -403,15 +403,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         else if (a == afloor2)
         {
-            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 2 piętrze
+            if (inElevator.size() != 0) 
             {
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 2), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
-            if (goTo == 2) // teraz musi się ustalić nowe goTo
+            if (goTo == 2) 
             {
-                if (Calls.size() != 0) // po pierwsze czy ktoś zawołał. Jak tak: na goTonastawiamy tego, który zawołał. Potem, jeżeli goTo>2 sprawdzamy, czy jest w windzie ktoś, kto chce jechać jeszcze wyżej
+                if (Calls.size() != 0)
                 {
                     if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 4)
                         goTo = 1;
@@ -426,7 +426,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                             if (inElevator[i] == 4) goTo = 4;
                         }
                 }
-                else if (Calls.size() == 0) // jeżeli nikt nie zawołał, to wybieramy pierwszą osobę z windy jako goTo, a jeżeli będzie to liczba większa, niż 2, to sprawdzamy, czy jest ktoś kto chce jechać jeszcze wyżej i nastawiamy goTo na to
+                else if (Calls.size() == 0)
                 {
                     if (inElevator.size() != 0)
                     {
@@ -443,9 +443,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             if (secondFloorPeople.size() != 0)
             {
-                if (goTo == 1) // gdy goTo to 1 - wrzucamy ludzi z 2 piętra chcących jechać na 1 piętro do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy
+                if (goTo == 1)
                 {
-                    for (int i = 0; i < secondFloorPeople.size() && inElevator.size() < 10; i++)
+                    for (int i = 0; i < secondFloorPeople.size() && inElevator.size() < 8; i++)
                     {
                         if (secondFloorPeople[i] == 1)
                         {
@@ -475,11 +475,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     count1 = 0;
                     toDelete = 0;
                 }
-                else if (goTo > 2) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
+                else if (goTo > 2) 
                 {
                     deleted3 = 0;
                     deleted4 = 0;
-                    for (int i = 0; i < secondFloorPeople.size() && inElevator.size() < 10; i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
+                    for (int i = 0; i < secondFloorPeople.size() && inElevator.size() < 8; i++) 
                     {
                         if (secondFloorPeople[i] == 3 || secondFloorPeople[i] == 4) 
                         {
@@ -536,15 +536,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         else if (a == afloor3)
         {
-            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 3 piętrze
+            if (inElevator.size() != 0) 
             {
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 3), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
-            if (goTo == 3) // teraz musi się ustalić nowe goTo
+            if (goTo == 3)
             {
-                if (Calls.size() != 0) // po pierwsze czy ktoś zawołał. Jak tak: na goTonastawiamy tego, który zawołał. Potem, jeżeli goTo>2 sprawdzamy, czy jest w windzie ktoś, kto chce jechać jeszcze wyżej
+                if (Calls.size() != 0)
                 {
                     if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 7)
                         goTo = 1;
@@ -553,13 +553,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12 || Calls[0] == 9)
                         goTo = 4;
 
-                    if (goTo < 3) // jeżeli goTo < 3, to jeżeli w windzie jest ktoś, kto chce jechać jeszcze niżej (czyli jak go to to 2, a w windzie jest ktoś, kto chce jechać na 1), to ustawiamy nowe goTo na 1;
+                    if (goTo < 3)
                         for (int i = 0; i < inElevator.size(); i++)
                         {
                             if (inElevator[i] < goTo) goTo = inElevator[i];
                         }
                 }
-                else if (inElevator.size() != 0) // jeżeli nikt nie zawołał, to wybieramy pierwszą osobę z windy jako goTo, a jeżeli będzie to liczba większa, niż 2, to sprawdzamy, czy jest ktoś kto chce jechać jeszcze wyżej i nastawiamy goTo na to
+                else if (inElevator.size() != 0)
                 {
                     inElevator[0] = goTo;
                     if (goTo < 3)
@@ -573,9 +573,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             if (thirdFloorPeople.size() != 0)
             {
-                if (goTo == 4) // gdy goTo to 1 - wrzucamy ludzi z 2 piętra chcących jechać na 1 piętro do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy
+                if (goTo == 4) 
                 {
-                    for (int i = 0; i < thirdFloorPeople.size() && inElevator.size() < 10; i++)
+                    for (int i = 0; i < thirdFloorPeople.size() && inElevator.size() < 8; i++)
                     {
                         if (thirdFloorPeople[i] == 4)
                         {
@@ -605,11 +605,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     count1 = 0;
                     toDelete = 0;
                 }
-                else if (goTo < 3) // gdy go to to 3 lub 4 - wrzucamy ludzi z 2 piętra chcących jechać na 3 i 4 do windy - usuwamy ich z secondFloorPeople, usuwamy ich z Calls i dodajemy do windy;
+                else if (goTo < 3) 
                 {
                     deleted1 = 0;
                     deleted2 = 0;
-                    for (int i = 0; i < thirdFloorPeople.size() && inElevator.size() < 10; i++) // przy dodawaniu ludzi uwzględniamy jeszcze, że jeżeli ktoś chce jechać na 4, a goTo to 3, to ustswiamy goTo na 4
+                    for (int i = 0; i < thirdFloorPeople.size() && inElevator.size() < 8; i++) 
                     {
                         if (thirdFloorPeople[i] == 1 || thirdFloorPeople[i] == 2)
                         {
@@ -666,15 +666,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         if (a == afloor4)
         {
-            if (inElevator.size() != 0) // wyrzucamy obecnych w windzie chcących wyjść na 1 piętrze
+            if (inElevator.size() != 0)
             {
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 4), inElevator.end());
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
-            if (fourthFloorPeople.size() != 0) // ważne, że to if, a nie else if; jeżeli są jacyś ludzie czekający na 1 piętrze, to ich wszystkich zabieramy (najpierw pakujemy ich do windy, a potem usuwamy całą kolejkę 4 piętra)
+            if (fourthFloorPeople.size() != 0)
             {
-                for (int i = 0; i < fourthFloorPeople.size() && inElevator.size() < 10; i++) // wrzucamy wszystkich ludzi czekających na 1 piętrze do windy, tu przerzucamy całość, bo to najniższe piętro, na środkowych piętrach trzeba to będzie pilnować
+                for (int i = 0; i < fourthFloorPeople.size() && inElevator.size() < 8; i++)
                 {
                     toDelete += 1;
                     inElevator.push_back(fourthFloorPeople[i]);
@@ -718,7 +718,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     Calls.end());
                 count3 = 0;
                 deleted3 = 0;
-                if (goTo == 4) // TO WYMAGANIE MOŻLIWE, ŻE TRZEBA BĘDZIE USUNĄĆ (ZOSTAWIĆ JEGO ZAWARTOŚĆ, ALE BEZ TEGO IFA GOTO==1
+                if (goTo == 4)
                 {
                     if (Calls.size() != 0)
                     {
@@ -741,7 +741,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                         }
                     }
                 }
-                for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                for (int i = 0; i < inElevator.size(); i++)
                 {
                     if (inElevator[i] < goTo) goTo = inElevator[i];
                 }
@@ -760,7 +760,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                                 goTo = 3;
                     }
                 }
-                for (int i = 0; i < inElevator.size(); i++) // sprawdzamy, czy ktoś z windzie chce jechać wyżej, niż goTo. Jak tak, to ustawiamy nowe goTo
+                for (int i = 0; i < inElevator.size(); i++) 
                 {
                     if (inElevator[i] < goTo) goTo = inElevator[i];
                 }
