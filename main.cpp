@@ -139,6 +139,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     static std::vector<int> Calls;
     static int goTo = 1;
 
+    static bool isWalking = false;
+    static int Walkingx = 0;
+    static int Walkingy = 0;
+    static int walkingNumber = 0;
+    static int numberOfWalking = 0;
 
     int count1 = 0;
     int count2 = 0;
@@ -298,6 +303,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             graphics.DrawEllipse(&pen, 30 * i + 657, a - 69, 18, 18);
         }
 
+        if (isWalking)
+        {
+            for (int i = 0; i < numberOfWalking; i++)
+            {
+                Gdiplus::PointF point(Walkingx - 30*i, Walkingy - 50);
+                wchar_t text[2];
+                swprintf_s(text, L"%d", walkingNumber);
+                graphics.DrawString(text, -1, &font, point, &brush);
+                graphics.DrawRectangle(&pen, Walkingx - 30*i, Walkingy - 50, 23, 35);
+                graphics.DrawRectangle(&pen, Walkingx + 4 - 30*i, Walkingy - 15, 15, 10);
+                graphics.DrawEllipse(&pen, Walkingx - 30*i + 4, Walkingy - 69, 18, 18);
+            }
+        }
 
         graphics.DrawRectangle(&pen, 645, 665, 250, 60);
 
@@ -308,17 +326,34 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         swprintf_s(text1, L"%d", inElevator.size()*70);
         graphics.DrawString(text1, -1, &font2, point1, &brush);
 
-
-
         EndPaint(hwnd, &ps);
-        return 0;
+        return 0; 
     }
     case WM_TIMER:
         if (a == afloor1)
         { 
             if (inElevator.size() != 0)
             {
+               int count = std::count(inElevator.begin(), inElevator.end(), 1);
+               if (count != 0)
+               {
+                   numberOfWalking = count;
+                    isWalking = true;
+                    Walkingx = 650;
+                    Walkingy = 650;
+                    walkingNumber = 1;
+                }
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 1), inElevator.end());
+
+                if (isWalking)
+                for (int i = 0; i < 60; i++)
+                {
+                    Walkingx -= 2;
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
+                }
+                numberOfWalking = 0;
+                isWalking = false;
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
@@ -419,9 +454,33 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
         else if (a == afloor2)
         {
+            isWalking = false;
             if (inElevator.size() != 0) 
             {
+                int count1 = std::count(inElevator.begin(), inElevator.end(), 2);
+                if (count1 != 0)
+                {
+                    numberOfWalking = count1;
+                    isWalking = true;
+                    Walkingx = 900;
+                    Walkingy = 500;
+                    walkingNumber = 2;
+                }
+                
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 2), inElevator.end());
+
+                if (isWalking)
+                {
+                    for (int i = 0; i < 60; i++)
+                    {
+                        Walkingx += 2;
+                        InvalidateRect(hwnd, NULL, TRUE);
+                        UpdateWindow(hwnd);
+                    }
+                }
+                
+                numberOfWalking = 0;
+                isWalking = false;
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
@@ -554,7 +613,28 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             if (inElevator.size() != 0) 
             {
+                int count1 = std::count(inElevator.begin(), inElevator.end(), 3);
+                if (count1 != 0)
+                {
+                    numberOfWalking = count1;
+                    isWalking = true;
+                    Walkingx = 650;
+                    Walkingy = 350;
+                    walkingNumber = 3;
+                }
+
+                
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 3), inElevator.end());
+
+                if(isWalking)
+                for (int i = 0; i < 60; i++)
+                {
+                    Walkingx -= 2;
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
+                }
+                numberOfWalking = 0;
+                isWalking = false;
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
@@ -684,7 +764,27 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             if (inElevator.size() != 0)
             {
+
+                for (int i = 0; i < inElevator.size(); i++)
+                {
+                    if (inElevator[i] == 4) numberOfWalking += 1;
+                    isWalking = true;
+                    Walkingx = 900;
+                    Walkingy = 200;
+                    walkingNumber = 4;
+                }
                 inElevator.erase(std::remove(inElevator.begin(), inElevator.end(), 4), inElevator.end());
+
+                if(isWalking)
+                for (int i = 0; i < 60; i++)
+                {
+                    Walkingx += 2;
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    UpdateWindow(hwnd);
+                }
+                numberOfWalking = 0;
+                isWalking = false;
+                
                 InvalidateRect(hwnd, NULL, TRUE);
                 UpdateWindow(hwnd);
             }
