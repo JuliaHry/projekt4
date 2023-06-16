@@ -330,6 +330,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0; 
     }
     case WM_TIMER:
+        if ((a == afloor2 || a == afloor3 || a == afloor4) && Calls.size() == 0 && inElevator.size() == 0 && goTo != 1)
+        {
+            Sleep(5000);
+            goTo = 1;
+        }
         if (a == afloor1)
         { 
             if (inElevator.size() != 0)
