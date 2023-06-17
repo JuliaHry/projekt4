@@ -22,6 +22,8 @@ const char* GetWindowClassName()
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+void StartTimer(HWND hwnd);
+void StopTimer(HWND hwnd);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -100,7 +102,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
-    SetTimer(hwnd, 1, 16, NULL); 
+    SetTimer(hwnd, 1, 1/100, NULL); 
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
@@ -153,6 +155,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     static int afloor2 = 500;
     static int afloor3 = 350; 
     static int afloor4 = 200;
+
+    static bool startCounting = false;
+    static DWORD startTime = 0;
 
     HWND hButton1 = reinterpret_cast<HWND>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
@@ -332,8 +337,33 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_TIMER:
         if ((a == afloor2 || a == afloor3 || a == afloor4) && Calls.size() == 0 && inElevator.size() == 0 && goTo != 1)
         {
-            Sleep(5000);
-            goTo = 1;
+            if (startCounting == false)
+            {
+                startCounting = true;
+                startTime = GetTickCount();
+            }
+            else if (startCounting == true)
+            {
+                DWORD currentTime = GetTickCount();
+                DWORD elapsedTime = currentTime - startTime;
+                if (elapsedTime >= 5000) 
+                {
+                    goTo = 1;
+                }
+            }
+        }
+        if (Calls.size() != 0 || inElevator.size() != 0)
+        {
+            if (Calls.size() != 0 && startCounting == true)
+            {
+                if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6)
+                    goTo = 2;
+                else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9)
+                    goTo = 3;
+                else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
+                    goTo = 4;
+            }
+            startCounting = false;
         }
         if (a == afloor1)
         { 
@@ -851,14 +881,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                                 goTo = 2;
                             else if (Calls[0] == 10 || Calls[0] == 11 || Calls[0] == 12)
                                 goTo = 3;
-                        }
-                        else if (fourthFloorPeople.size() == 0) {
-                            if (Calls[0] == 1 || Calls[0] == 2 || Calls[0] == 3 || Calls[0] == 10)
-                                goTo = 1;
-                            else if (Calls[0] == 4 || Calls[0] == 5 || Calls[0] == 6 || Calls[0] == 11)
-                                goTo = 2;
-                            else if (Calls[0] == 7 || Calls[0] == 8 || Calls[0] == 9 || Calls[0] == 12)
-                                goTo = 4;
                         }
                     }
                 }
